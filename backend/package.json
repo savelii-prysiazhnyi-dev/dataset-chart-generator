@@ -6,7 +6,7 @@
   "main": "dist/src/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "dev:docker": "tsx watch --host 0.0.0.0 src/server.ts",
+    "dev:docker": "tsx watch --include 'src/**/*' src/server.ts",
     "build": "tsc",
     "start": "node dist/src/server.js",
     "start:prod": "node dist/src/server.js",

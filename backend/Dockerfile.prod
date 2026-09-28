@@ -1,0 +1,54 @@
+FROM node:22-slim AS base
+
+RUN apt-get update -y && \
+    apt-get install -y --no-install-recommends ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN corepack enable && corepack prepare pnpm@12.3.4 --activate
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+
+WORKDIR /app
+
+FROM base AS install
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY backend/package.json ./backend/
+
+RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
+    pnpm --filter backend install --frozen-lockfile
+
+FROM base AS prerelease
+
+COPY --from=install /app/node_modules ./node_modules
+COPY --from=install /app/backend/node_modules ./backend/node_modules
+COPY pnpm-workspace.yaml package.json ./
+COPY backend ./backend
+
+WORKDIR /app/backend
+RUN pnpm run build
+RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
+    pnpm --filter backend prune --prod
+
+FROM base AS release
+
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOST=0.0.0.0
+
+WORKDIR /app
+
+USER node
+
+COPY --chown=node:node --from=prerelease /app/node_modules ./node_modules
+COPY --chown=node:node --from=prerelease /app/backend/node_modules ./backend/node_modules
+COPY --chown=node:node --from=prerelease /app/backend/dist ./backend/dist
+COPY --chown=node:node --from=prerelease /app/backend/package.json ./backend/package.json
+COPY --chown=node:node --from=prerelease /app/package.json ./package.json
+
+WORKDIR /app/backend
+
+EXPOSE 3000
+
+CMD ["node", "dist/src/server.js"]

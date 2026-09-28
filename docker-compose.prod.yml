@@ -1,0 +1,45 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile.prod
+    image: dataset-chart-backend:prod
+    container_name: dataset_chart_backend_prod
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOST: 0.0.0.0
+      CORS_ORIGIN: "*"
+      LOG_LEVEL: info
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:3000/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))\""]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile.prod
+      args:
+        VITE_API_URL: ""
+    image: dataset-chart-frontend:prod
+    container_name: dataset_chart_frontend_prod
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-5173}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

@@ -1,0 +1,58 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile.dev
+    image: dataset-chart-backend:dev
+    container_name: dataset_chart_backend
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      HOST: 0.0.0.0
+      CORS_ORIGIN: "*"
+      LOG_LEVEL: info
+    networks:
+      - app-network
+    develop:
+      watch:
+        - action: sync
+          path: ./backend/src
+          target: /app/backend/src
+        - action: rebuild
+          path: ./backend/package.json
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile.dev
+    image: dataset-chart-frontend:dev
+    container_name: dataset_chart_frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    environment:
+      VITE_API_URL: http://localhost:${BACKEND_PORT:-3000}
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend/src
+          target: /app/frontend/src
+        - action: sync
+          path: ./frontend/index.html
+          target: /app/frontend/index.html
+        - action: sync
+          path: ./frontend/vite.config.ts
+          target: /app/frontend/vite.config.ts
+        - action: rebuild
+          path: ./frontend/package.json
+
+networks:
+  app-network:
+    driver: bridge
