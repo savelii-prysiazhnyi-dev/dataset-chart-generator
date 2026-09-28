@@ -4,6 +4,10 @@ A modern, high-performance web application showcasing interactive data visualiza
 
 Built with a stateless **Fastify 5** backend and a **React 19 + Tailwind CSS v4** frontend, optimized with **pnpm workspaces** and production-grade **Docker** containerization.
 
+<img width="1901" height="927" alt="image" src="https://github.com/user-attachments/assets/c1c4162c-ae61-45df-9b5a-3fbcb38f90a0" />
+<img width="1901" height="927" alt="image" src="https://github.com/user-attachments/assets/251a8f95-9fe1-454f-aa6e-abe4dd347d3a" />
+
+
 ---
 
 ## Features
