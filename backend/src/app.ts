@@ -54,14 +54,14 @@ export const buildApp = async (
     },
   });
 
-  // Health check endpoint
-  app.get('/health', async () => {
-    return {
-      status: 'ok',
-      service: 'dataset-chart-generation-backend',
-      timestamp: new Date().toISOString(),
-    };
+  // Health check endpoints
+  const healthHandler = async () => ({
+    status: 'ok',
+    service: 'dataset-chart-generation-backend',
+    timestamp: new Date().toISOString(),
   });
+  app.get('/health', healthHandler);
+  app.get('/api/health', healthHandler);
 
   // Register chart routes under both /chart and /api/chart
   await app.register(chartRoutes, { prefix: '/chart' });
