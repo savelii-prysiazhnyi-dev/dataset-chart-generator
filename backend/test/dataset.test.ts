@@ -4,7 +4,7 @@ import request from 'supertest';
 import type { FastifyInstance } from 'fastify';
 import ExcelJS from 'exceljs';
 
-import { buildApp } from '../src/createApp.js';
+import { buildApp } from '../src/app.js';
 
 const csvBuffer = (rows: string[][]): Buffer =>
   Buffer.from(rows.map(r => r.join(',')).join('\n'));

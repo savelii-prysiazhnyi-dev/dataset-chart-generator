@@ -1,4 +1,4 @@
-import { buildApp } from './createApp.js';
+import { buildApp } from './app.js';
 import { env } from './config/env.js';
 
 const start = async () => {

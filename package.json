@@ -2,7 +2,6 @@
   "name": "dataset-chart-generation",
   "private": true,
   "version": "1.0.0",
-  "type": "module",
   "scripts": {
     "dev": "pnpm --parallel --filter \"./backend\" --filter \"./frontend\" dev",
     "dev:backend": "pnpm --filter ./backend dev",
